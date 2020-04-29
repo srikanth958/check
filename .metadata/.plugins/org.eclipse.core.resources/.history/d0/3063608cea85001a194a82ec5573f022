@@ -1,0 +1,60 @@
+package com.app.export;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class beanToExcel {
+
+	public static void main(String[] args) throws Exception {
+		userBean bean=new userBean("ram", 25, "telugu");
+		FileOutputStream fout=new FileOutputStream("C:\\Users\\Lenova\\Desktop\\bean.xlsx");
+		XSSFWorkbook workbook =new XSSFWorkbook();
+		XSSFSheet sheet=workbook.createSheet("beandata");
+		Row row=sheet.createRow(0);
+		row.createCell(0).setCellValue("name");
+		row.createCell(1).setCellValue("age");
+		row.createCell(2).setCellValue("language");
+		writebean(workbook, sheet, bean);
+		
+		workbook.write(fout);
+
+	}
+	public static void writebean(XSSFWorkbook workbook,XSSFSheet sheet,userBean bean) {
+		
+	}
+
+}
+class userBean {
+	String name;
+	int age;
+	 String language;
+	 
+	public userBean(String name, int age, String language) {
+		this.name = name;
+		this.age = age;
+		this.language = language;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public String getLanguage() {
+		return language;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	 
+}

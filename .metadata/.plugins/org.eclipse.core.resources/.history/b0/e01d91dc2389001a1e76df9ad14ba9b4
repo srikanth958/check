@@ -1,0 +1,19 @@
+package com.inno.exports;
+
+import java.io.File;
+import java.sql.ResultSet;
+import java.util.Collection;
+/*
+ * SuperExport is an interface which provides overloaded methods to help implementing 
+   classes to write their own implementation
+ * 
+ * @author Srikanth.P
+ */
+
+public interface SuperExport<T> {
+	 File Export(ResultSet rs,String Filename) throws Exception;
+	 File Export(T object,String Filename);
+	 File Export(Collection<T> object,String Filename);
+
+
+}

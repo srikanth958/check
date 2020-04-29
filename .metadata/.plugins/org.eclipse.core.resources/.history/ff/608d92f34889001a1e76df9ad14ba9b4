@@ -1,0 +1,129 @@
+package com.inno.exports;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Collection;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelExport<T> implements SuperExport<T>{
+
+	@Override
+	public File Export(ResultSet rs,String Filename) throws Exception {
+		ResultSetMetaData rsmd=rs.getMetaData();
+		int colcount=rsmd.getColumnCount();
+		File file=new File("C:\\Users\\Lenova\\Desktop\\"+Filename);
+		FileOutputStream fout=new FileOutputStream(file);
+		XSSFWorkbook workbook=new XSSFWorkbook();
+		XSSFSheet sheet=workbook.createSheet("Sheet1");
+		Row row=sheet.createRow(0);
+		int clmn=1;
+		for(int i=0;i<colcount;i++) {
+			
+			row.createCell(i).setCellValue(rsmd.getColumnName(clmn++));
+		}
+		
+		insertRsData(sheet, rs, rsmd,colcount);
+		workbook.write(fout);
+		return file;
+	}
+	public static void insertRsData(XSSFSheet sheet ,ResultSet rs,ResultSetMetaData rsmd,int colcount) throws Exception {
+		
+		int rows=1;
+		while(rs.next()) {
+			
+			Row rowdata=sheet.createRow(rows++);
+			int clmns=1;
+			for(int j=0;j<colcount;j++) {
+				
+				String type=rsmd.getColumnTypeName(clmns);
+				
+				if(type== "VARCHAR") {
+					rowdata.createCell(j).setCellValue(rs.getString(clmns++));
+				}
+				else if(type=="INT") {
+					rowdata.createCell(j).setCellValue(rs.getInt(clmns++));
+				}
+				else if(type== "DATE") {
+					rowdata.createCell(j).setCellValue(rs.getDate(clmns++));
+				}
+				else if(type== "TIME") {
+					rowdata.createCell(j).setCellValue(rs.getTime(clmns++));
+				}
+				else if(type== "FLOAT") {
+					rowdata.createCell(j).setCellValue(rs.getFloat(clmns++));
+				}
+				else if(type== "LONG") {
+					rowdata.createCell(j).setCellValue(rs.getLong(clmns++));
+				}
+				else if(type== "DOUBLE") {
+					rowdata.createCell(j).setCellValue(rs.getDouble(clmns++));
+				}
+			
+				}
+				
+			}
+	}
+	@Override
+	public File Export(T object, String Filename) throws Exception {
+		Object obj=object;
+		Field fields[]=obj.getClass().getDeclaredFields();
+//		System.out.println(fields.length);
+		File file=new File("C:\\Users\\Lenova\\Desktop\\"+Filename);
+		FileOutputStream fout=new FileOutputStream(file);
+		XSSFWorkbook workbook=new XSSFWorkbook();
+		XSSFSheet sheet=workbook.createSheet("Sheet1");
+		Row row=sheet.createRow(0);
+		for(int i=0;i<fields.length;i++) {
+			Field name=fields[i];
+			row.createCell(i).setCellValue(name.getName());
+		}
+		insertBeanData(obj, fields, sheet);
+		workbook.write(fout);
+		return null;
+	}
+	public void insertBeanData(Object obj,Field fields[],XSSFSheet sheet) throws Exception, IllegalAccessException {
+		int  cell=0;
+		Row datarow=sheet.createRow(1);
+		
+		for (Field field:fields) {
+			
+			field.setAccessible(true);
+			String fname=field.getName();
+			Object value=field.get(obj);
+			System.out.println(value);
+			
+			datarow.createCell(cell++).setCellValue("\""+value+"\"");
+			
+//			if(	field.getType()== String.class) {
+//				
+//				datarow.createCell(cell++).setCellValue((String)value);
+//		}
+//			else {	
+//			if	(field.getType()== Integer.class) {
+//				datarow.createCell(cell++).setCellValue((int)value);
+//			
+//		      }
+//		    else if	(field.getType()== Boolean.class) {
+//			datarow.createCell(cell++).setCellValue((boolean)value);}
+//		    else if	(field.getType()== Float.class) {
+//				datarow.createCell(cell++).setCellValue((float)value);}
+//		    else if	(field.getType()== Double.class) {
+//				datarow.createCell(cell++).setCellValue((double)value);}
+//			}
+			}
+	}
+	@Override
+	public File Export(Collection<T> object, String Filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
